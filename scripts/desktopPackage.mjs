@@ -8,6 +8,14 @@ import os from 'node:os';
 const stage = path.resolve('dist/desktop-app');
 const output = path.resolve('artifacts/desktop');
 const electronVersion = '45.3.1';
+const windowsHost = process.platform === 'win32';
+const windowsOnly = process.argv.includes('--win-only') || (windowsHost && !process.argv.includes('--mac-only'));
+
+function runPowerShell(script, values) {
+  execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], {
+    env: { ...process.env, ...values }, stdio: 'pipe',
+  });
+}
 
 try {
   await rm(stage, { recursive: true, force: true });
@@ -50,7 +58,10 @@ try {
   icoHeader.writeUInt32LE(png.length, 14);
   icoHeader.writeUInt32LE(22, 18);
   await writeFile(`${output}/app.ico`, Buffer.concat([icoHeader, png]));
-  const targets = process.argv.includes('--mac-only') ? [['darwin', process.arch]] : [['darwin', 'arm64'], ['darwin', 'x64'], ['win32', 'x64']];
+  if (windowsHost && process.argv.includes('--mac-only')) {
+    throw new Error('macOS packaging requires a macOS host (PlistBuddy and codesign). Use npm run desktop:package:win on Windows.');
+  }
+  const targets = windowsOnly ? [['win32', 'x64']] : process.argv.includes('--mac-only') ? [['darwin', process.arch]] : [['darwin', 'arm64'], ['darwin', 'x64'], ['win32', 'x64']];
   const artifacts = [];
 
   for (const [platform, arch] of targets) {
@@ -99,7 +110,13 @@ try {
     const directory = `${output}/Color Picker Draw-${platform}-${arch}`;
     await rm(directory, { recursive: true, force: true });
     await mkdir(directory, { recursive: true });
-    execFileSync('unzip', ['-q', runtimeZip, '-d', directory]);
+    if (windowsHost) {
+      runPowerShell('$ErrorActionPreference = "Stop"; Expand-Archive -LiteralPath $env:DRAWING_ARCHIVE_INPUT -DestinationPath $env:DRAWING_ARCHIVE_OUTPUT', {
+        DRAWING_ARCHIVE_INPUT: runtimeZip, DRAWING_ARCHIVE_OUTPUT: directory,
+      });
+    } else {
+      execFileSync('unzip', ['-q', runtimeZip, '-d', directory]);
+    }
 
     if (platform === 'darwin') {
       const appDirectory = `${directory}/Color Picker Draw.app`;
@@ -139,7 +156,13 @@ try {
     const filename = `color-picker-draw-${version}-${platform}-${arch}.zip`;
     const destination = `${output}/${filename}`;
     await rm(destination, { force: true });
-    execFileSync('zip', ['-qry', destination, path.basename(directory)], { cwd: path.dirname(directory) });
+    if (windowsHost) {
+      runPowerShell('$ErrorActionPreference = "Stop"; Compress-Archive -LiteralPath $env:DRAWING_ARCHIVE_INPUT -DestinationPath $env:DRAWING_ARCHIVE_OUTPUT', {
+        DRAWING_ARCHIVE_INPUT: directory, DRAWING_ARCHIVE_OUTPUT: destination,
+      });
+    } else {
+      execFileSync('zip', ['-qry', destination, path.basename(directory)], { cwd: path.dirname(directory) });
+    }
     artifacts.push({ filename, sha256: createHash('sha256').update(await readFile(destination)).digest('hex') });
   }
 

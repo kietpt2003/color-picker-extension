@@ -16,6 +16,7 @@
     "icons": "node scripts/generateIcons.mjs",
     "webstore:images": "npm run build && node scripts/webstoreImages.mjs",
     "desktop:package": "node scripts/desktopPackage.mjs",
+    "desktop:package:win": "node scripts/desktopPackage.mjs --win-only",
     "desktop:package:mac": "node scripts/desktopPackage.mjs --mac-only",
     "test:drawing": "npm run build && node scripts/drawingBrowserCheck.mjs",
     "test:desktop": "node scripts/desktopCheck.mjs",

@@ -4,7 +4,9 @@ import { readFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 const exportFile = path.join(os.tmpdir(), `color-picker-desktop-export-${process.pid}.png`);
 
-const executable = process.env.DRAWING_DESKTOP_EXECUTABLE || path.resolve(`artifacts/desktop/Color Picker Draw-darwin-${process.arch}/Color Picker Draw.app/Contents/MacOS/ColorPickerDraw`);
+const executable = process.env.DRAWING_DESKTOP_EXECUTABLE || path.resolve(process.platform === 'win32'
+  ? 'artifacts/desktop/Color Picker Draw-win32-x64/ColorPickerDraw.exe'
+  : `artifacts/desktop/Color Picker Draw-darwin-${process.arch}/Color Picker Draw.app/Contents/MacOS/ColorPickerDraw`);
 let application;
 const environment = { ...process.env };
 delete environment.ELECTRON_RUN_AS_NODE;
@@ -33,6 +35,13 @@ try {
     });
   });
   expect(nativeState.every((window) => { return window.top; })).toBe(true);
+  if (process.platform === 'win32') {
+    // Hidden Windows windows defer renderer resizing; exercise the real viewport.
+    await application.evaluate(({ BrowserWindow }) => {
+      for (const window of BrowserWindow.getAllWindows()) { window.showInactive(); }
+      BrowserWindow.getAllWindows().find((window) => { return window.webContents.getURL().includes('role=toolbar'); }).moveTop();
+    });
+  }
   const sample = async (x, y) => {
     try {
       return await overlay.locator('canvas').evaluate((canvas, point) => {
@@ -166,11 +175,13 @@ try {
   await expect(toolbar.locator('.drawing-status')).toContainText('Could not capture the screen');
   await expect(toolbar.locator('[data-action="export"]')).toBeEnabled();
 
-  await application.evaluate(({ systemPreferences }) => { systemPreferences.getMediaAccessStatus = () => { return 'denied'; }; });
-  await toolbar.locator('[data-action="export"]').click();
-  await toolbar.locator('[data-export-mode="screen"]').click();
-  await expect(toolbar.locator('.drawing-status')).toContainText('Screen Recording');
-  await expect(toolbar.locator('[data-action="export"]')).toBeEnabled();
+  if (process.platform === 'darwin') {
+    await application.evaluate(({ systemPreferences }) => { systemPreferences.getMediaAccessStatus = () => { return 'denied'; }; });
+    await toolbar.locator('[data-action="export"]').click();
+    await toolbar.locator('[data-export-mode="screen"]').click();
+    await expect(toolbar.locator('.drawing-status')).toContainText('Screen Recording');
+    await expect(toolbar.locator('[data-action="export"]')).toBeEnabled();
+  }
 
   for (const [language, label] of [['vi', 'Bút vẽ'], ['zh-CN', '画笔'], ['en', 'Pen']]) {
     await application.evaluate(({ app }, language) => {
@@ -182,7 +193,7 @@ try {
   await toolbar.screenshot({ path: 'artifacts/drawing-desktop-toolbar.png', omitBackground: true });
   await overlay.screenshot({ path: 'artifacts/drawing-desktop-layer.png', omitBackground: true });
   expect(errors).toEqual([]);
-  console.info('macOS desktop passed: packaged app, transparent always-on-top windows, pen/text/eraser, undo/clear, native mouse passthrough and hide/show.');
+  console.info(`${process.platform} desktop passed: packaged app, transparent always-on-top windows, pen/text/eraser, undo/clear, native mouse passthrough and hide/show.`);
 } finally {
   await application?.close();
   await rm(exportFile, { force: true });
