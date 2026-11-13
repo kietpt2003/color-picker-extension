@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Color Picker — Privacy Policy</title>
+<style>
+body {
+  max-width: 820px;
+  margin: 48px auto;
+  padding: 0 24px;
+  font: 17px/1.7 system-ui, sans-serif;
+  color: #20202b;
+  background: #fff;
+}
+h1 {
+  line-height: 1.2;
+}
+</style>
+</head>
+<body>
+<h1>Color Picker Privacy Policy</h1>
+<p>Publisher: PUBLISHER_NAME<br>Contact: CONTACT_EMAIL<br>Last updated: November 12, 2026</p>
+<p>Color Picker processes colors on your device. It does not transmit browsing history, page content, images, personal information or usage analytics to remote servers. It has no accounts, ads, remote scripts, external fonts or runtime network requests.</p>
+<p>The extension uses the <strong>storage</strong> permission to keep your selected language, current color, saved palette and recent colors in <code>chrome.storage.local</code>. It does not use browser account sync. Clear recent colors with the Clear button and remove saved colors with each swatch&#x27;s remove button. Uninstalling the extension removes its local extension storage.</p>
+<p>When you click Pick screen color, the browser provides its native EyeDropper. The extension receives only the sRGB hexadecimal value of the pixel you explicitly select. The color picker does not record the screen or run background sampling. The selected color may then be stored in local history. Press Escape to cancel.</p>
+<p>Copy buttons write the selected color code to your clipboard in response to a click. When you explicitly paste an image with Ctrl+V / Cmd+V, the extension reads the image included in that paste event and processes it locally. Ordinary text paste is handled by the focused input. The extension does not poll the clipboard or request clipboard-read permission.</p>
+<p>When you click Draw on this page, the extension uses activeTab and scripting to add a local drawing overlay to that current webpage. It does not request permanent access to all websites or inject drawing tools automatically. Annotation strokes, text and undo history are held in that page session; you can explicitly export the transparent drawing layer as a PNG. Closing the drawing tools or leaving the page releases that session.</p>
+<p>Desktop drawing uses the separate Color Picker Draw application. It creates transparent windows above other applications. Ordinary drawing and drawing-only export do not capture the applications underneath. The app link shares only your chosen color and language. Drawings and typed annotation text remain in memory until you close the app, except for PNG files that you explicitly save. The desktop companion does not start a network service, use analytics or request a native messaging host installation.</p>
+<p>When you choose, drop or paste an image file, Color Picker decodes it locally to inspect pixels, list distinct colors and count how many pixels use each color. The original image and full image color inventory stay in memory for that popup or window session; they are not uploaded or written to extension storage. Removing the image or closing the view releases this session data. Colors explicitly selected from the image may be saved as the current color and in local history or your palette. Export all CSV creates a local file containing color codes, color channels and pixel counts, without the source image or file name.</p>
+<p>The drawing Save menu has three explicit modes. Drawing-only saves a transparent annotation PNG. Web view with drawings captures the visible webpage (or a region you select in the desktop companion), then composites annotations. Entire screen with drawings captures a selected screen in Chrome, or the active drawing display in the companion. These images are saved only to your device. Toolbars, eraser preview and selection UI are excluded.</p>
+<p>Chrome&#x27;s desktopCapture permission opens the screen selector for your requested full-screen save. The temporary capture helper reads a screen video frame and stops every media track after saving or canceling. It does not keep a recording or run capture in the background after the save operation. Temporary session storage contains only the request ID and originating tab/window IDs for restoring the UI; it contains no captured image. The desktop app uses the OS desktop-capture API when you select a web/screen save mode; macOS may ask for Screen Recording permission. Canceling or denying capture restores the tools and preserves your drawing.</p>
+<p>Color Picker uses the data described above solely to provide its disclosed user-facing features. We do not sell this data, use it for advertising or credit decisions, or transfer it to unrelated third parties.</p>
+<p>For questions about this policy, contact CONTACT_EMAIL. The publisher will update this policy when the disclosed processing changes.</p>
+</body>
+</html>
