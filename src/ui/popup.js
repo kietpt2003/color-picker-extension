@@ -97,6 +97,7 @@ function renderColor() {
 
   for (const [format, input] of formatInputs) {
     input.value = formatColor(color, format);
+    input.removeAttribute('aria-invalid');
   }
 }
 
@@ -126,8 +127,40 @@ function createFormats() {
     label.textContent = format.toUpperCase();
     const input = document.createElement('input');
     input.className = 'format-value';
-    input.readOnly = true;
-    input.addEventListener('click', () => { input.select(); });
+    input.spellcheck = false;
+    input.autocomplete = 'off';
+    input.setAttribute('aria-describedby', 'notifier');
+    const applyValue = () => {
+      if (!ready || input.value === formatColor(state.color, format)) {
+        return;
+      }
+
+      const color = parseColor(input.value);
+      if (!color) {
+        input.setAttribute('aria-invalid', 'true');
+        notify('invalidColor', true);
+        return;
+      }
+
+      // Formats without alpha only edit the color channels.
+      if (['hex', 'rgb', 'hsl', 'hsv'].includes(format)) {
+        color.a = state.color.a;
+      }
+      setColor(color);
+      commitColor();
+    };
+    input.addEventListener('change', applyValue);
+    input.addEventListener('input', () => { input.removeAttribute('aria-invalid'); });
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        applyValue();
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        input.value = formatColor(state.color, format);
+        input.removeAttribute('aria-invalid');
+      }
+    });
     const button = document.createElement('button');
     button.className = 'icon-button';
     button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M15 8V4H4v11h4"/></svg>';

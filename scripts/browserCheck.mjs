@@ -1,13 +1,9 @@
 import { chromium, expect } from '@playwright/test';
-import { createHash } from 'node:crypto';
 import { mkdtemp, rm, mkdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 
 const extension = path.resolve('dist/extension');
-const extensionId = [...createHash('sha256').update(extension).digest('hex').slice(0, 32)].map((digit) => {
-  return String.fromCharCode(97 + parseInt(digit, 16));
-}).join('');
 const profile = await mkdtemp(path.join(os.tmpdir(), 'color-picker-browser-'));
 let context;
 const errors = [];
@@ -20,12 +16,54 @@ try {
     args: [`--disable-extensions-except=${extension}`, `--load-extension=${extension}`],
     viewport: { width: 560, height: 1100 },
   });
+  const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
+  const extensionId = new URL(worker.url()).host;
   const page = await context.newPage();
   page.on('pageerror', (error) => { errors.push(error.message); });
   await page.goto(`chrome-extension://${extensionId}/ui/popup.html`);
   await expect(page.locator('#pick')).toBeEnabled();
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.locator('.format-row')).toHaveCount(7);
+  groups++;
+
+  const formatFields = page.locator('.format-value');
+  for (const [index, value, expected] of [
+    [0, '#123456', '#123456'],
+    [1, '#12345680', '#12345680'],
+    [2, 'rgb(255, 0, 0)', '#FF000080'],
+    [3, 'rgba(0, 255, 0, 0.25)', '#00FF0040'],
+    [4, 'hsl(240, 100%, 50%)', '#0000FF40'],
+    [5, 'hsla(60, 100%, 50%, 0.75)', '#FFFF00BF'],
+    [6, 'hsv(180, 100%, 100%)', '#00FFFFBF'],
+  ]) {
+    const field = formatFields.nth(index);
+    await expect(field).toBeEditable();
+    await field.fill(value);
+    if (index % 2) {
+      await field.press('Tab');
+    } else {
+      await field.press('Enter');
+    }
+    await expect(page.locator('#colorInput')).toHaveValue(expected);
+    await expect(formatFields.nth(0)).toHaveValue(expected.slice(0, 7));
+    await expect.poll(() => page.evaluate(async () => {
+      const { color } = await chrome.storage.local.get('color');
+      return [color.r, color.g, color.b];
+    })).toEqual(expected.slice(1, 7).match(/../g).map((channel) => parseInt(channel, 16)));
+  }
+  await formatFields.nth(2).fill('rgb(999, 0, 0)');
+  await formatFields.nth(2).press('Enter');
+  await expect(formatFields.nth(2)).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.locator('#colorInput')).toHaveValue('#00FFFFBF');
+  await formatFields.nth(2).press('Escape');
+  await expect(formatFields.nth(2)).toHaveValue('rgb(0, 255, 255)');
+  await expect(formatFields.nth(2)).not.toHaveAttribute('aria-invalid');
+  await formatFields.nth(2).fill('rgb(12, 34, 56)');
+  await page.locator('.format-row').nth(2).locator('button').click();
+  await expect(page.locator('#notifier')).toHaveText('Copied rgb(12, 34, 56)');
+  await page.reload();
+  await expect(page.locator('#pick')).toBeEnabled();
+  await expect(page.locator('#colorInput')).toHaveValue('#0C2238BF');
   groups++;
 
   await page.locator('#colorInput').fill('rgba(67, 255, 100, 0.85)');

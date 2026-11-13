@@ -1,6 +1,6 @@
 {
   "name": "color-picker-extension",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "type": "module",
   "description": "Offline screen color picker and color format converter for Chrome MV3",
