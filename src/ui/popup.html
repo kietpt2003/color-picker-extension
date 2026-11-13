@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Color Picker</title>
+    <link rel="icon" href="../icons/32.png">
+    <link rel="stylesheet" href="ui.css">
+    <script type="module" src="popup.js"></script>
+  </head>
+  <body>
+    <main class="app">
+      <header class="header">
+        <div class="brand"><img class="brand-mark" src="../icons/32.png" alt="" width="28" height="28"><strong>Color Picker<span class="brand-dot">.</span></strong></div>
+        <div class="header-actions">
+          <select id="language" data-label="language"><option value="en">EN</option><option value="vi">VI</option><option value="zh-CN">中文</option></select>
+          <button id="openWindow" class="icon-button" data-label="openWindow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6m0-6-9 9M10 4H4v16h16v-6"/></svg></button>
+        </div>
+      </header>
+      <p class="subtitle" data-i18n="subtitle"></p>
+      <div class="source-tabs" role="tablist" data-label="colorSource">
+        <button id="screenSource" role="tab" aria-selected="true" aria-controls="screenPanel" data-i18n="screenSource"></button>
+        <button id="imageSource" role="tab" aria-selected="false" aria-controls="imagePanel" data-i18n="imageSource"></button>
+      </div>
+      <section id="screenPanel" class="pick-section" role="tabpanel" aria-labelledby="screenSource">
+        <button id="pick" class="primary-button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5 5 5M12 7l5 5-8 8H4v-5l8-8Zm3-3 2-2 5 5-2 2"/></svg><span data-i18n="pick"></span></button>
+        <p class="hint" id="pickHint" data-i18n="pickHint"></p>
+      </section>
+      <section id="imagePanel" class="image-panel" role="tabpanel" aria-labelledby="imageSource" hidden>
+        <label class="image-upload" for="imageFile"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><strong data-i18n="imageUpload"></strong><span data-i18n="imageInputHint"></span><span data-i18n="imageUploadHint"></span></label>
+        <input id="imageFile" class="sr-only image-file" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif,image/bmp" data-label="imageUpload">
+        <p class="hint" data-i18n="imageLocalHint"></p>
+        <p id="imageProgress" class="image-progress" role="status" hidden></p>
+        <div id="imageContent" hidden>
+          <div class="image-heading"><span id="imageMetadata"></span><button id="removeImage" class="text-button" data-i18n="imageRemove"></button></div>
+          <div class="image-stage checker"><canvas id="imageCanvas" width="1" height="1" tabindex="0" role="img" data-label="imageCanvasLabel" aria-describedby="imagePickHint"></canvas><span id="imageMarker" class="image-marker"></span><div id="imageLens" class="image-lens checker" hidden aria-hidden="true"><canvas id="imageMagnifier" width="140" height="140"></canvas></div></div>
+          <p id="imagePickHint" class="hint" data-i18n="imagePickHint"></p>
+          <div class="image-inspector"><div class="image-pixel-info"><strong id="imageHoverCode"></strong><code id="imageHoverRgba"></code><small id="imageCoordinates"></small></div><span class="image-color-chip checker"><span id="imageHoverSwatch"></span></span></div>
+        </div>
+        <div id="imageInventory" hidden>
+          <div class="section-heading"><h2 id="imageColorCount"></h2><button id="exportImageColors" class="text-button" data-i18n="imageExport"></button></div>
+          <p class="hint" data-i18n="imageAllColorsHint"></p>
+          <div id="imageColors" class="image-colors"></div>
+          <form id="imagePageForm" class="image-pagination"><button id="imagePrevious" type="button" class="icon-button" data-label="imagePrevious">‹</button><label for="imagePageNumber" data-i18n="imagePage"></label><input id="imagePageNumber" type="number" min="1" value="1" data-label="imagePage"><span id="imagePageTotal"></span><button type="submit" class="text-button" data-i18n="imageGo"></button><button id="imageNext" type="button" class="icon-button" data-label="imageNext">›</button></form>
+        </div>
+      </section>
+      <section class="drawing-launch">
+        <div class="section-heading"><h2 data-i18n="drawHeading"></h2></div>
+        <div class="drawing-launch-actions"><button id="drawPage" class="primary-button" data-i18n="drawPage"></button><button id="drawDesktop" class="desktop-draw-button" data-i18n="drawDesktop"></button></div>
+        <p class="hint" data-i18n="drawDesktopRequired"></p>
+      </section>
+      <section class="editor">
+        <div id="plane" class="color-plane" role="group" tabindex="0" data-label="saturation" aria-describedby="planeValue"><span id="cursor" class="plane-cursor"></span></div>
+        <span id="planeValue" class="sr-only"></span>
+        <div class="slider-layout">
+          <label class="native-preview checker" data-label="nativePicker"><span id="preview"></span><input id="nativeColor" type="color" value="#7c5cfc" data-label="nativePicker"></label>
+          <div class="sliders">
+            <label class="slider-row"><span class="sr-only" data-i18n="hue"></span><input id="hue" class="hue" type="range" min="0" max="360" step="1" value="252" data-label="hue"></label>
+            <label class="slider-row"><span class="sr-only" data-i18n="opacity"></span><input id="alpha" class="alpha" type="range" min="0" max="100" step="1" value="100" data-label="opacity"></label>
+          </div>
+          <div class="opacity-value"><output id="alphaValue" for="alpha">100%</output><span data-i18n="opacity"></span></div>
+        </div>
+        <form id="colorForm">
+          <label for="colorInput" class="section-label" data-i18n="colorValue"></label>
+          <div class="input-group"><input id="colorInput" type="text" spellcheck="false" autocomplete="off" data-placeholder="colorPlaceholder" aria-describedby="notifier"><button type="submit" class="icon-button" data-label="apply"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></button></div>
+        </form>
+      </section>
+      <section class="formats-section">
+        <div class="section-heading"><h2 data-i18n="formats"></h2><button id="save" class="text-button" data-i18n="save"></button></div>
+        <div id="formats" class="formats"></div>
+        <p class="hint alpha-note" data-i18n="alphaNote"></p>
+      </section>
+      <section class="collection-section">
+        <div class="section-heading"><h2 data-i18n="palette"></h2><span id="paletteCount" class="count"></span></div>
+        <div id="palette" class="swatches"></div><p id="paletteEmpty" class="empty" data-i18n="paletteEmpty"></p>
+      </section>
+      <section class="collection-section">
+        <div class="section-heading"><h2 data-i18n="recent"></h2><button id="clear" class="text-button muted" data-i18n="clear"></button></div>
+        <div id="recent" class="swatches"></div><p id="recentEmpty" class="empty" data-i18n="recentEmpty"></p>
+      </section>
+      <footer data-i18n="localOnly"></footer>
+    </main>
+    <div id="imageDropOverlay" class="image-drop-overlay" role="status" hidden><strong data-i18n="imageDrop"></strong></div>
+    <div id="notifier" class="notifier" role="status" aria-live="polite" hidden></div>
+  </body>
+</html>

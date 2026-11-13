@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "minimum_chrome_version": "120",
+  "name": "__MSG_extensionName__",
+  "description": "__MSG_extensionDescription__",
+  "default_locale": "en",
+  "version": "0.0.1",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "desktopCapture"
+  ],
+  "action": {
+    "default_popup": "ui/popup.html",
+    "default_title": "__MSG_extensionName__",
+    "default_icon": {
+      "16": "icons/16.png",
+      "32": "icons/32.png"
+    }
+  },
+  "icons": {
+    "16": "icons/16.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "drawing/*.js",
+        "drawing/drawing.css",
+        "core/i18n.js",
+        "locales/*.js"
+      ],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  }
+}

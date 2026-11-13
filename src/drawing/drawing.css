@@ -1,0 +1,268 @@
+:host {
+  all: initial;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.drawing-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  touch-action: none;
+}
+
+.drawing-toolbar, .drawing-toolbar * {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.drawing-toolbar {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(640px, calc(100vw - 24px));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 7px;
+  padding: 9px;
+  border: 1px solid #e8e5f0;
+  border-radius: 18px;
+  background: #f7f6fb;
+  color: #4c4960;
+  box-shadow: 0 5px 22px #2b1d4930;
+  pointer-events: auto;
+  z-index: 3;
+}
+
+.drawing-toolbar button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 7px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: #78718e;
+  cursor: pointer;
+}
+
+.drawing-toolbar button:hover, .drawing-toolbar [aria-pressed="true"] {
+  background: #e7defa;
+  color: #783def;
+}
+
+.drawing-toolbar button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.drawing-toolbar button:focus-visible, .drawing-toolbar input:focus-visible {
+  outline: 2px solid #a077ef;
+  outline-offset: 1px;
+}
+
+.drawing-toolbar svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.drawing-grip {
+  align-self: center;
+  cursor: move;
+  padding: 6px;
+  touch-action: none;
+  user-select: none;
+  -webkit-app-region: drag;
+}
+
+.drawing-tool-grid, .drawing-actions {
+  display: grid;
+  grid-template-columns: repeat(5, 34px);
+  gap: 2px;
+  background: white;
+  padding: 5px;
+  border-radius: 12px;
+}
+
+.drawing-actions {
+  grid-template-columns: repeat(3, 34px);
+}
+
+.drawing-color {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: white;
+  border-radius: 12px;
+  padding: 8px 15px;
+  font-size: 11px;
+}
+
+.drawing-color input {
+  border: 0;
+  padding: 0;
+  width: 38px;
+  height: 38px;
+  background: none;
+  cursor: pointer;
+}
+
+.drawing-color input::-webkit-color-swatch-wrapper {
+  padding: 3px;
+}
+
+.drawing-color input::-webkit-color-swatch {
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #a46af5;
+}
+
+.drawing-sliders {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  width: 155px;
+  padding: 8px;
+  border-radius: 12px;
+  background: white;
+}
+
+.drawing-sliders label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 10px;
+}
+
+.drawing-sliders label span {
+  display: flex;
+  justify-content: space-between;
+}
+
+.drawing-sliders input {
+  width: 100%;
+  margin: 0;
+  accent-color: #832efa;
+}
+
+.drawing-status {
+  flex-basis: 100%;
+  padding: 1px 7px;
+  font-size: 10px;
+  color: #91859e;
+}
+
+.drawing-text-editor {
+  position: fixed;
+  width: min(360px, calc(100vw - 30px));
+  min-height: 85px;
+  max-height: 300px;
+  border: 1px dashed #8d62dd;
+  border-radius: 4px;
+  padding: 4px;
+  background: #ffffffcc;
+  outline: none;
+  line-height: 1.25;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+.drawing-eraser-cursor {
+  position: fixed;
+  box-sizing: border-box;
+  border: 2px solid white;
+  border-radius: 50%;
+  background: #ffffff18;
+  box-shadow: 0 0 0 1px #302743, inset 0 0 0 1px #302743;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.drawing-export-menu {
+  position: absolute;
+  right: 12px;
+  top: calc(100% + 5px);
+  padding: 8px;
+  border: 1px solid #e5def2;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 5px 20px #30274330;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 215px;
+}
+
+.drawing-export-menu[hidden] {
+  display: none;
+}
+
+.drawing-toolbar .drawing-export-menu button {
+  width: 100%;
+  height: auto;
+  min-height: 32px;
+  text-align: left;
+  justify-content: flex-start;
+  font-size: 11px;
+  padding: 8px;
+}
+
+:host([data-capturing]) .drawing-toolbar,
+:host([data-capturing]) .drawing-canvas,
+:host([data-capturing]) .drawing-eraser-cursor,
+:host([data-screen-capturing]) .drawing-toolbar,
+:host([data-screen-capturing]) .drawing-eraser-cursor {
+  visibility: hidden !important;
+}
+
+.drawing-capture-blocker, .drawing-region-layer {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  pointer-events: auto;
+  z-index: 5;
+  touch-action: none;
+}
+
+.drawing-region-layer {
+  cursor: crosshair;
+}
+
+.drawing-region-box {
+  position: fixed;
+  border: 2px dashed #8958ef;
+  background: #a67df918;
+  box-shadow: 0 0 0 100vmax #23173955;
+  pointer-events: none;
+}
+
+.drawing-region-hint {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 9px;
+  padding: 12px 18px;
+  background: #302743;
+  color: white;
+  font: 13px sans-serif;
+  pointer-events: none;
+}
+
+:host([data-screen-capturing]) .drawing-canvas {
+  visibility: visible !important;
+}

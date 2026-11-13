@@ -1,0 +1,19 @@
+.desktop-guide {
+  max-width: 700px;
+  padding: 50px 30px;
+  line-height: 1.7;
+}
+
+.desktop-guide h1 {
+  font-size: 30px;
+  margin-top: 35px;
+}
+
+.desktop-guide li {
+  padding: 8px 0;
+}
+
+.desktop-guide a {
+  text-decoration: none;
+  margin-top: 22px;
+}

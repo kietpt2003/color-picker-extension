@@ -1,0 +1,29 @@
+{
+  "name": "color-picker-extension",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Offline screen color picker and color format converter for Chrome MV3",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/verify.mjs",
+    "test": "node scripts/verify.mjs",
+    "package": "npm run build && node scripts/package.mjs",
+    "test:browser": "npm run build && node scripts/browserCheck.mjs",
+    "icons": "node scripts/generateIcons.mjs",
+    "webstore:images": "npm run build && node scripts/webstoreImages.mjs",
+    "desktop:package": "node scripts/desktopPackage.mjs",
+    "desktop:package:mac": "node scripts/desktopPackage.mjs --mac-only",
+    "test:drawing": "npm run build && node scripts/drawingBrowserCheck.mjs",
+    "test:desktop": "node scripts/desktopCheck.mjs",
+    "test:capture": "npm run build && node scripts/captureBrowserCheck.mjs",
+    "webstore:submission": "node scripts/submissionPackage.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "resedit": "2.0.3"
+  }
+}
