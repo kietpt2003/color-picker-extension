@@ -1,0 +1,14 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+body.toolbar {
+  pointer-events: none;
+}
+
+body.toolbar .drawing-toolbar {
+  pointer-events: auto;
+}
